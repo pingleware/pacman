@@ -1,4 +1,4 @@
-let scale = 24;
+let scale = 8;
 const gridWidth = 28;
 const gridHeight = 31;
 
@@ -22,9 +22,12 @@ function setup()
   let scaleY = windowHeight / gridHeight;
   scale = min(scaleX, scaleY);
 
+  // yOff = 0;
+  // xOff = 0;
+
   yOff = (windowHeight - scale * gridHeight) / 2;
   xOff = (windowWidth - scale * gridWidth) / 2;
-  
+
   // createCanvas(gridWidth * scale, gridHeight * scale);
   createCanvas(windowWidth, windowHeight);
   frameRate(setFrameRate);
@@ -34,9 +37,12 @@ function setup()
   bonus = new Bonus(createVector(13.5, 17), scale, xOff, yOff, 100);
   reset();
   // noLoop();
+
+  document.getElementById('defaultCanvas0').addEventListener("touchstart", startTouch, false);
+  document.getElementById('defaultCanvas0').addEventListener("touchmove", moveTouch, false);
 }
 
-function windowResized() 
+function windowResized()
 {
   setup();
 }
@@ -271,10 +277,55 @@ function toggleImmunity()
   console.log(message);
 }
 
-function touchMoved(event) {
-  console.log('touchMoved');
-  console.log(event);
-}
+// Swipe Up / Down / Left / Right
+var initialX = null;
+var initialY = null;
+
+function startTouch(e) {
+  initialX = e.touches[0].clientX;
+  initialY = e.touches[0].clientY;
+};
+
+function moveTouch(e) {
+  if (initialX === null) {
+    return;
+  }
+
+  if (initialY === null) {
+    return;
+  }
+
+  var currentX = e.touches[0].clientX;
+  var currentY = e.touches[0].clientY;
+
+  var diffX = initialX - currentX;
+  var diffY = initialY - currentY;
+
+  if (Math.abs(diffX) > Math.abs(diffY)) {
+    // sliding horizontally
+    if (diffX > 0) {
+      // swiped left
+      pacman.changeDirection(createVector(-1, 0));
+    } else {
+      // swiped right
+      pacman.changeDirection(createVector(1, 0));
+    }
+  } else {
+    // sliding vertically
+    if (diffY > 0) {
+      // swiped up
+      pacman.changeDirection(createVector(0, -1));
+    } else {
+      // swiped down
+      pacman.changeDirection(createVector(0, 1));
+    }
+  }
+
+  initialX = null;
+  initialY = null;
+
+  e.preventDefault();
+};
 
 function draw()
 {
@@ -314,12 +365,20 @@ function draw()
   cpuLoad.push(round( renderTime * 100 / (1/setFrameRate)));
   cpuLoad.shift();
 
-  // document.getElementById("position").innerHTML = "PosX = " + round((mouseX / scale) - 0.5).toString() + " PosY = " + round((mouseY / scale) - 0.5).toString();
-  // document.getElementById("score").innerHTML = "Score: " + pacman.score;
-  // document.getElementById("lives").innerHTML = "Lives: " + pacman.lives;
+  // data = document.getElementById("data");
+  // data.innerHTML = "PosX = " + round((mouseX / scale) - 0.5).toString() + " PosY = " + round((mouseY / scale) - 0.5).toString();
+  // data.innerHTML += "<br>";
+  // data.innerHTML += "Score: " + pacman.score;
+  // data.innerHTML += "<br>";
+  // data.innerHTML += "Lives: " + pacman.lives;
+  // data.innerHTML += "<br>";
   // // document.getElementById("level").innerHTML = "Level: " + level;
   // // document.getElementById("ghostMode").innerHTML = "Ghost Mode: " + ((scatter)?"Scatter":"Hunt");
   // document.getElementById("immunity").innerHTML = "Immunity " + ((immunity)?"On":"Off");
-  // document.getElementById("time").innerHTML = "Time = " + round(millis() / 1000).toString();
-  // document.getElementById("renderTime").innerHTML = "Load = " + round( renderTime * 100 / (1/setFrameRate)) + "%";
+  // data.innerHTML += "Time = " + round(millis() / 1000).toString();
+  // data.innerHTML += "<br>";
+  // data.innerHTML += "Load = " + round( renderTime * 100 / (1/setFrameRate)) + "%";
+  // data.innerHTML += "<br>";
+  // data.innerHTML += "FPS = " + Math.floor(frameRate());
+  // data.innerHTML += "<br>";
 }
