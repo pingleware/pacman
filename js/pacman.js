@@ -15,6 +15,10 @@ let xOff = 0;
 let yOff = 0;
 let showPath = false;
 
+var introAudio, wakaAudio, intermissionAudio, deathAudio;
+
+let gameStatus = 0;
+
 function setup()
 {
   // Adjust the scale to get it to fit the screen
@@ -35,6 +39,12 @@ function setup()
   map.show();
   pacman = new Pacman(scale, xOff, yOff, createVector(13.5, 23), level, frightenGhosts);
   bonus = new Bonus(createVector(13.5, 17), scale, xOff, yOff, 100);
+
+  introAudio = new Audio('./sounds/pacman_beginning.wav');
+  wakaAudio = new Audio('./sounds/pacman_chomp.wav');
+  intermissionAudio = new Audio('./sounds/pacman_intermission.wav');
+  deathAudio = new Audio('./sounds/pacman_death.wav');
+
   reset();
   // noLoop();
 
@@ -87,18 +97,22 @@ function keyPressed() {
   switch (keyCode)
   {
     case UP_ARROW:
+      chompSound();
       pacman.changeDirection(createVector(0, -1));
       break;
 
     case DOWN_ARROW:
+      chompSound();
       pacman.changeDirection(createVector(0, 1));
       break;
 
     case RIGHT_ARROW:
+      chompSound();
       pacman.changeDirection(createVector(1, 0));
       break;
 
     case LEFT_ARROW:
+      chompSound();
       pacman.changeDirection(createVector(-1, 0));
       break;
 
@@ -109,7 +123,27 @@ function keyPressed() {
     case 80: //P
       showPath = !showPath;
       break;
+
+    case 13:
+      introSound();
+      break;
   }
+}
+
+function introSound() {
+  introAudio.play();
+}
+
+function chompSound() {
+  wakaAudio.play();
+}
+
+function intermissionSound() {
+  intermissionAudio.play();
+}
+
+function deathSound() {
+  deathAudio.play();
 }
 
 function getEverything ()
@@ -202,6 +236,7 @@ function showGhosts()
       {
         pacman.kill();
         pauseTime = frame + 5 * setFrameRate;
+        deathSound();
       }
     }
   }
@@ -364,6 +399,7 @@ function draw()
   var renderTime = (millis() - startTime) / 1000;
   cpuLoad.push(round( renderTime * 100 / (1/setFrameRate)));
   cpuLoad.shift();
+
 
   // data = document.getElementById("data");
   // data.innerHTML = "PosX = " + round((mouseX / scale) - 0.5).toString() + " PosY = " + round((mouseY / scale) - 0.5).toString();
