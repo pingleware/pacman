@@ -15,7 +15,9 @@ let xOff = 0;
 let yOff = 0;
 let showPath = false;
 
+var sirenAudio;
 var introAudio, wakaAudio, intermissionAudio, deathAudio;
+var eatfruitAudio, eatghostAudio;
 
 let gameStatus = 0;
 
@@ -40,10 +42,17 @@ function setup()
   pacman = new Pacman(scale, xOff, yOff, createVector(13.5, 23), level, frightenGhosts);
   bonus = new Bonus(createVector(13.5, 17), scale, xOff, yOff, 100);
 
+  sirenAudio = new Audio('./sounds/pacman_siren.mp3');
+  //sirenAudio.addEventListener('ended',function(e){
+  //  sirenAudio.play();
+  //});
+  //sirenAudio.play();
   introAudio = new Audio('./sounds/pacman_beginning.wav');
   wakaAudio = new Audio('./sounds/pacman_chomp.wav');
   intermissionAudio = new Audio('./sounds/pacman_intermission.wav');
   deathAudio = new Audio('./sounds/pacman_death.wav');
+  eatfruitAudio = new Audio('./sounds/pacman_eatfruit.wav');
+  eatghostAudio = new Audio('./sounds/pacman_eatghost.wav');
 
   reset();
   // noLoop();
@@ -146,6 +155,14 @@ function deathSound() {
   deathAudio.play();
 }
 
+function eatGhostsSound() {
+  eatghostAudio.play();
+}
+
+function eatFruitSound() {
+  eatfruitAudio.play();
+}
+
 function getEverything ()
 {
   everything = {
@@ -231,6 +248,7 @@ function showGhosts()
       if (ghosts[i].frightened)
       {
         ghosts[i].kill();
+        eatGhostsSound();
       }
       else if (!ghosts[i].dead && !immunity)
       {
